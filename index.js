@@ -138,7 +138,7 @@ app.get('/item/:userid', async (req, res) => {
   const user = await User.find({ user_id: req.params.userid });
   const item = await Item.find({ item_id: user[0]?.item });
 
-  return sendResponse(res, 200, 'getting_item', item, null);
+  return sendResponse(res, 200, 'getting_item', item[0], null);
 })
 
 app.get('/preview/:userid', async (req, res) => {
