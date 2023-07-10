@@ -145,7 +145,7 @@ app.get('/preview/:userid', async (req, res) => {
   const user = await User.find({ user_id: req.params.userid });
   const item = await Item.find({ item_id: user[0]?.item });
 
-  res.sendFile(path.join(__dirname, `./${item.path}`));
+  res.sendFile(path.join(__dirname, `./${item[0]?.path}`));
 })
 
 app.put('/item/:userid', isAuthorized, async (req, res) => {
