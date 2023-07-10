@@ -111,7 +111,11 @@ app.post('/login', async (req, res) => {
 app.get('/items/:userid', isAuthorized, async (req, res) => {
   const user = await User.find({ user_id: req.params.userid });
   let item = await Item.find({ item_id: user[0].item });
+  console.log(item);
   item = item[0];
+
+  console.log(user);
+  console.log(item);
 
   return sendResponse(
     res,
