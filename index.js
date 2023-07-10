@@ -136,8 +136,16 @@ app.get('/items/:userid', isAuthorized, async (req, res) => {
 
 app.get('/item/:userid', async (req, res) => {
   const user = await User.find({ user_id: req.params.userid });
+  const item = await Item.find({ item_id: user[0]?.item });
 
-  return sendResponse(res, 200, 'getting_item', user.item, null);
+  return sendResponse(res, 200, 'getting_item', item, null);
+})
+
+app.get('/preview/:userid', async (req, res) => {
+  const user = await User.find({ user_id: req.params.userid });
+  const item = await Item.find({ item_id: user[0]?.item });
+
+  res.sendFile(path.join(__dirname, `./${item.path}`));
 })
 
 app.put('/item/:userid', isAuthorized, async (req, res) => {
