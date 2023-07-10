@@ -110,6 +110,8 @@ app.post('/login', async (req, res) => {
 
 app.get('/items/:userid', isAuthorized, async (req, res) => {
   const user = await User.find({ user_id: req.params.userid });
+  let item = await Item.find({ item_id: user[0].item });
+  item = item[0];
 
   return sendResponse(
     res,
@@ -118,10 +120,10 @@ app.get('/items/:userid', isAuthorized, async (req, res) => {
     {
       items: user.items,
       default: {
-        path: file.path,
-        size: file.size,
-        name: file.filename,
-        fieldName: file.fieldname,
+        path: item.path,
+        size: item.size,
+        name: item.filename,
+        fieldName: item.fieldname,
       },
     },
     null,
