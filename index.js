@@ -9,7 +9,7 @@ const express = require('express'),
   spawn = require('child_process').spawn,
   multer = require('multer');
 
-const { User } = require('./models');
+const { User, Item } = require('./models');
 
 const {
   randomGenerator,
@@ -111,7 +111,27 @@ app.post('/login', async (req, res) => {
 app.get('/items/:userid', isAuthorized, async (req, res) => {
   const user = await User.find({ user_id: req.params.userid });
 
-  return sendResponse(res, 200, 'getting_items', { items: user.items, default: user.item }, null);
+  return sendResponse(
+    res,
+    200,
+    'getting_items',
+    {
+      items: user.items,
+      default: {
+        path: file.path,
+        size: file.size,
+        name: file.filename,
+        fieldName: file.fieldname,
+      },
+    },
+    null,
+  );
+})
+
+app.get('/item/:userid', async (req, res) => {
+  const user = await User.find({ user_id: req.params.userid });
+
+  return sendResponse(res, 200, 'getting_item', user.item, null);
 })
 
 app.put('/item/:userid', isAuthorized, async (req, res) => {
@@ -205,13 +225,28 @@ app.post('/upload/:userid', isAuthorized, upload.single('userItem'), async (req,
   const user_id = req.params.userid;
   const file = req.file;
   if (!file) return sendResponse(res, 400, 'error_uploading_file', null, 'error_uploading_file');
+  const newItem = {
+    item_id: randomGenerator(6),
+    path: file.path,
+    size: file.size,
+    name: file.filename,
+    fieldName: file.fieldname,
+  };
+
+  await Item.create(newItem);
 
   await User.updateOne(
     { user_id },
-    { $set: { item: file.path } }
+    { $set: { item: newItem.item_id } }
   );
 
-  sendResponse(res, 200, 'file_uploaded', { path: file.path, size: file.size, name: file.filename, fieldName: file.fieldname }, null);
+  sendResponse(
+    res,
+    200,
+    'file_uploaded',
+    newItem,
+    null,
+  );
 });
 
 const port = process.env.PORT || 4080;
