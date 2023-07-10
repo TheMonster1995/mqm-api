@@ -47,7 +47,7 @@ const upload = multer({ storage: storage })
 //This needs security
 
 const app = express();
-mongoose.connect("mongodb://localhost/easemtest");
+mongoose.connect("mongodb://localhost/mqm");
 
 app.set("view engine", "ejs");
 app.set('views', path.join(__dirname, '/views'));
@@ -211,10 +211,10 @@ app.post('/upload/:userid', isAuthorized, upload.single('userItem'), async (req,
     { $set: { item: file.path } }
   );
 
-  sendResponse(res, 200, 'file_uploaded', file.path, null);
+  sendResponse(res, 200, 'file_uploaded', { path: file.path, size: file.size, name: file.filename, fieldName: file.fieldname }, null);
 });
 
-const port = process.env.PORT || 4010;
+const port = process.env.PORT || 4080;
 
 const backUp = async () => {
   console.log('backup called');
@@ -234,7 +234,7 @@ const backUp = async () => {
   });
 }
 
-const injectUser = async (name, cafe_id) => {
+const injectUser = async (name, username) => {
   console.log('inject user called');
 
   const password = '12346578';
@@ -247,11 +247,10 @@ const injectUser = async (name, cafe_id) => {
     role: 'admin',
     signup_date: new Date(),
     email: '',
-    username: cafe_id,
+    username,
     name,
     status: 'active',
     password: encPassword,
-    cafe_id,
   };
 
   const newUser = await User.create(userData);
@@ -262,11 +261,7 @@ const injectUser = async (name, cafe_id) => {
 app.listen(port, async () => {
   console.log("Server is listening on port: ", port);
   let dbBackupTask = nodeCron.schedule('37 20 * * *', backUp);
-  // const name = 'سان',
-  //   cafe_id = 'sun';
-  // const name = 'هم/آسا',
-  //   cafe_id = 'ham_asa';
-  // const adminId = await injectUser(name, cafe_id);
+  const adminId = await injectUser('Parsa', 'parsa_t');
   // injectCafe(name, cafe_id, adminId);
   // dbIdFixer();
   // indexFixer();
