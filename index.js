@@ -39,7 +39,7 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     const dt = new Date();
-    cb(null, req.params?.userid ? `${req.params?.userid}_${file.originalname.match(/\.[a-zA-Z0-9]*$/)[0]}_${dt.toLocaleDateString()}` : file.fieldname)
+    cb(null, req.params?.userid ? `${req.params?.userid}_${file.filename ?? ''}${dt.toLocaleDateString()}${file.originalname.match(/\.[a-zA-Z0-9]*$/)[0]}` : file.fieldname)
   }
 })
 
@@ -261,7 +261,7 @@ const injectUser = async (name, username) => {
 app.listen(port, async () => {
   console.log("Server is listening on port: ", port);
   let dbBackupTask = nodeCron.schedule('37 20 * * *', backUp);
-  const adminId = await injectUser('Parsa', 'parsa_t');
+  // const adminId = await injectUser('Parsa', 'parsa_t');
   // injectCafe(name, cafe_id, adminId);
   // dbIdFixer();
   // indexFixer();
