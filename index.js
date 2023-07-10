@@ -39,7 +39,7 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     const dt = new Date();
-    cb(null, req.params?.userid ? `${req.params?.userid}_${file.filename ?? ''}${dt.toLocaleDateString()}${file.originalname.match(/\.[a-zA-Z0-9]*$/)[0]}` : file.fieldname)
+    cb(null, req.params?.userid ? `${req.params?.userid}_${file.filename ?? ''}${dt.toISOString()}${file.originalname.match(/\.[a-zA-Z0-9]*$/)[0]}` : file.fieldname)
   }
 })
 
