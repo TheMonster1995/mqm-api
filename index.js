@@ -38,7 +38,8 @@ const storage = multer.diskStorage({
     cb(null, 'uploads')
   },
   filename: function (req, file, cb) {
-    cb(null, req.params?.itemid ? `${req.params?.cafeid}_${req.params?.itemid}${file.originalname.match(/\.[a-zA-Z0-9]*$/)[0]}` : file.fieldname)
+    const dt = new Date();
+    cb(null, req.params?.userid ? `${req.params?.userid}_${file.originalname.match(/\.[a-zA-Z0-9]*$/)[0]}_${dt.toLocaleDateString()}` : file.fieldname)
   }
 })
 
@@ -67,10 +68,10 @@ app.get('/auth', async (req, res) => {
   });
 
   const user = await User.find({ user_id: result.data });
-  const { username } = user[0];
+  const { username, user_id } = user[0];
 
   if (result != 'error')
-    return sendResponse(res, 200, 'logged_in', { username }, null);
+    return sendResponse(res, 200, 'logged_in', { username, userid: user_id }, null);
 
   return res.status(401).send({
     message: 'not_logged_in'
@@ -101,6 +102,7 @@ app.post('/login', async (req, res) => {
     {
       accessToken,
       username: user.username,
+      userid: user.user_id,
     },
     null
   );
@@ -177,7 +179,8 @@ app.post('/password/forgot', async (req, res) => {
     {
       accessToken,
       username: user.username,
-      name: user.name
+      name: user.name,
+      userid: user.user_id,
     },
     null
   )
